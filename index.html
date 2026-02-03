@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aetheris AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // Enable class-based dark mode
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              glass: {
+                100: 'rgba(255, 255, 255, 0.1)',
+                200: 'rgba(255, 255, 255, 0.2)',
+                300: 'rgba(255, 255, 255, 0.3)',
+                400: 'rgba(255, 255, 255, 0.4)',
+                500: 'rgba(255, 255, 255, 0.5)',
+                600: 'rgba(255, 255, 255, 0.6)',
+              },
+              darkglass: {
+                100: 'rgba(0, 0, 0, 0.1)',
+                200: 'rgba(0, 0, 0, 0.2)',
+                300: 'rgba(0, 0, 0, 0.4)',
+                400: 'rgba(0, 0, 0, 0.6)',
+                500: 'rgba(0, 0, 0, 0.8)',
+              }
+            },
+            backdropBlur: {
+              xs: '2px',
+            },
+            animation: {
+              'blink': 'blink 1s step-end infinite',
+              'gradient-slow': 'gradient 15s ease infinite',
+            },
+            keyframes: {
+              blink: {
+                '0%, 100%': { opacity: '1' },
+                '50%': { opacity: '0' },
+              },
+              gradient: {
+                '0%, 100%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        /* Base background is handled by App.tsx classes now for Theme switching */
+        min-height: 100vh;
+        overflow: hidden;
+        transition: background-color 0.5s ease, color 0.5s ease;
+      }
+      
+      /* macOS-style interactions */
+      button, .interactive-element {
+        transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      button:active {
+        transform: scale(0.96);
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(156, 163, 175, 0.5);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(156, 163, 175, 0.8);
+      }
+      
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+      }
+
+      /* Dark Mode Glass */
+      .dark .glass-panel {
+        background: rgba(20, 20, 25, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      }
+      
+      .glass-button {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+      .dark .glass-button {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: #e5e7eb;
+      }
+      
+      .glass-button:hover {
+        background: rgba(255, 255, 255, 0.6);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      }
+      .dark .glass-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .glass-input {
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: #334155;
+      }
+      .dark .glass-input {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+      }
+      
+      .glass-input::placeholder {
+        color: #64748b;
+      }
+      .dark .glass-input::placeholder {
+        color: #94a3b8;
+      }
+
+      .glass-input:focus {
+        background: rgba(255, 255, 255, 0.5);
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+      .dark .glass-input:focus {
+        background: rgba(0, 0, 0, 0.5);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Markdown Styles */
+      .prose pre {
+        background: rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(5px);
+        border-radius: 0.5rem;
+        padding: 1rem;
+      }
+      .dark .prose pre {
+        background: rgba(255, 255, 255, 0.05);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
