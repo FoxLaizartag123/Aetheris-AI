@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Sidebar from './components/Sidebar';
@@ -16,6 +17,7 @@ const App: React.FC = () => {
   
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
+  // Theme persistence
   useEffect(() => {
     const savedTheme = localStorage.getItem('aetheris_theme') as 'light' | 'dark' | null;
     if (savedTheme) setTheme(savedTheme);
@@ -30,24 +32,45 @@ const App: React.FC = () => {
 
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
+  // Load user-specific chats when user logs in
   useEffect(() => {
-    const savedChats = localStorage.getItem('aetheris_chats');
-    if (savedChats) setChats(JSON.parse(savedChats));
-  }, []);
+    if (user) {
+      const savedChats = localStorage.getItem(`aetheris_chats_${user.email}`);
+      if (savedChats) {
+        const parsedChats = JSON.parse(savedChats);
+        setChats(parsedChats);
+        if (parsedChats.length > 0) {
+          setActiveChatId(parsedChats[0].id);
+        }
+      } else {
+        setChats([]);
+        setActiveChatId(null);
+        createNewChat();
+      }
+    }
+  }, [user]);
 
+  // Save user-specific chats
   useEffect(() => {
-    if (chats.length > 0) localStorage.setItem('aetheris_chats', JSON.stringify(chats));
-  }, [chats]);
+    if (user && chats.length > 0) {
+      localStorage.setItem(`aetheris_chats_${user.email}`, JSON.stringify(chats));
+    }
+  }, [chats, user]);
 
   const handleLogin = (loggedInUser: User) => {
     setUser(loggedInUser);
-    const savedChats = localStorage.getItem('aetheris_chats');
-    if (!savedChats || JSON.parse(savedChats).length === 0) {
-      createNewChat();
-    } else {
-        const parsed = JSON.parse(savedChats);
-        setChats(parsed);
-        setActiveChatId(parsed[0].id);
+    // Loading is handled by the useEffect dependent on 'user'
+  };
+
+  const handleLogout = (saveData: boolean) => {
+    if (user) {
+      if (!saveData) {
+        localStorage.removeItem(`aetheris_chats_${user.email}`);
+      }
+      setUser(null);
+      setChats([]);
+      setActiveChatId(null);
+      setSidebarOpen(false);
     }
   };
 
@@ -58,7 +81,7 @@ const App: React.FC = () => {
       messages: [],
       createdAt: Date.now(),
     };
-    setChats([newChat, ...chats]);
+    setChats(prev => [newChat, ...prev]);
     setActiveChatId(newChat.id);
   };
 
@@ -68,7 +91,9 @@ const App: React.FC = () => {
     if (activeChatId === id) {
       setActiveChatId(updatedChats.length > 0 ? updatedChats[0].id : null);
     }
-    localStorage.setItem('aetheris_chats', JSON.stringify(updatedChats));
+    if (user) {
+      localStorage.setItem(`aetheris_chats_${user.email}`, JSON.stringify(updatedChats));
+    }
   };
 
   const isImageRequest = (text: string) => {
@@ -151,6 +176,7 @@ const App: React.FC = () => {
         chats={chats} activeChatId={activeChatId || ''} onSelectChat={setActiveChatId}
         onNewChat={createNewChat} onDeleteChat={deleteChat} isOpenMobile={sidebarOpen}
         closeMobile={() => setSidebarOpen(false)} user={user} theme={theme} toggleTheme={toggleTheme}
+        onLogout={handleLogout}
       />
       <main className="flex-1 flex flex-col h-full relative overflow-hidden">
         <div className="md:hidden flex items-center p-4 pb-0 z-10">

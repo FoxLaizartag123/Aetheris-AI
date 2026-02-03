@@ -1,4 +1,5 @@
-import { GoogleGenAI, Type } from "@google/genai";
+
+import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { AppMode, Attachment, Message, MessageRole } from "../types";
 
 // Helper to convert file to base64 for multimodal input
@@ -62,7 +63,8 @@ export const generateResponse = async (
     if (mode === AppMode.IMAGE_GEN) {
       const imageModel = 'gemini-2.5-flash-image';
       
-      const response = await retryWithBackoff(() => ai.models.generateContent({
+      // Fix: Explicitly typed response as GenerateContentResponse to fix property access errors on unknown type
+      const response: GenerateContentResponse = await retryWithBackoff(() => ai.models.generateContent({
         model: imageModel,
         contents: {
           parts: [{ text: currentMessage }]
@@ -144,7 +146,8 @@ export const generateResponse = async (
       config.tools = [{ googleSearch: {} }];
     }
 
-    const response = await retryWithBackoff(() => ai.models.generateContent({
+    // Fix: Explicitly typed response as GenerateContentResponse to fix property access errors on unknown type
+    const response: GenerateContentResponse = await retryWithBackoff(() => ai.models.generateContent({
       model,
       contents,
       config

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Chat, User } from '../types';
 import { Trash2, MessageSquarePlus, Search, MessageSquare, LogOut, Settings, X, Moon, Sun, UserCircle } from 'lucide-react';
@@ -14,6 +15,7 @@ interface SidebarProps {
   user: User | null;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  onLogout: (saveData: boolean) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -26,11 +28,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   closeMobile,
   user,
   theme,
-  toggleTheme
+  toggleTheme,
+  onLogout
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const filteredChats = chats.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -46,6 +50,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       onDeleteChat(chatToDelete);
       setChatToDelete(null);
     }
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
   };
 
   return (
@@ -193,12 +201,57 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </div>
                     </div>
 
-                    <button className="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium">
+                    <button 
+                      onClick={handleLogoutClick}
+                      className="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    >
                         <LogOut size={16} />
                         Log out
                     </button>
                 </div>
             </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-sm glass-panel bg-white/90 dark:bg-[#1a1a1a]/95 rounded-2xl shadow-2xl p-6 border border-white/20 dark:border-white/10 text-center">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LogOut size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Log Out</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Do you want to save your data?</p>
+            
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  onLogout(true);
+                  setShowLogoutConfirm(false);
+                  setShowProfile(false);
+                }}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20"
+              >
+                Yes
+              </button>
+              <button 
+                onClick={() => {
+                  onLogout(false);
+                  setShowLogoutConfirm(false);
+                  setShowProfile(false);
+                }}
+                className="w-full py-3 bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-white/20 transition-all"
+              >
+                No
+              </button>
+              <button 
+                onClick={() => setShowLogoutConfirm(false)}
+                className="w-full py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
